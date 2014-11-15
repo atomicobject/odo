@@ -28,7 +28,7 @@ x86 and x86-64 systems, as well as on a Raspberry Pi (32-bit ARM).
 
 If the gcc-specific feature defines in `types.h` are not recognized by
 your C99 compiler, you may need to set `COUNTER_SIZE` in the Makefile
-yourself -- `-DCOUNTER_SIZE=4` for 32-bit systems and `-DCOUNTER_SIZE=8`
+yourself: `-DCOUNTER_SIZE=4` for 32-bit systems and `-DCOUNTER_SIZE=8`
 for 64-bit systems.
 
 
