@@ -1,0 +1,78 @@
+odo(1) -- an atomic odometer for the command line
+=================================================
+
+## SYNOPSIS
+
+`odo` [-i | -r | -s COUNT] [-p] <file>
+
+## DESCRIPTION
+
+odo atomically updates a count in a file, which will be created if not
+present. The count is text-formatted (e.g. "00012345\n"), and will
+accurately increment or reset the counter even when multiple processes
+are attempting to change the counter at the same time. (It uses memory
+mapping and atomic compare-and-swap operations to eliminate race
+conditions.)
+
+This could be used to track some intermittent event, like services being
+restarted. Since the counter is just a number in a text file, it's easy
+ls to compose odo with other tools.
+
+## OPTIONS
+
+These options impact how the counter is updated:
+
+  * `-i`:
+    Increment the counter. (This is the default.)
+
+  * `-r`:
+    Reset the counter to 0.
+
+  * `-s COUNT`:
+    Update the counter to a specific value.
+
+  * `-p`:
+    Print the new value of the counter after updating.
+
+## EXIT STATUS
+
+Returns 0 if the counter has been successfully updated. Returns 1 if the
+file could not be read, created, or written, or if its current contents
+do not match the expected format of a counter file.
+
+## EXAMPLES
+
+This atomically increments a counter in /log/restarts. If the counter
+file does not exist, it is created as 0 and incremented to 1.
+
+    $ odo /log/restarts
+    
+Same, but print the updated count:
+
+    $ odo -p /log/restarts
+    
+Reset the count to 0:
+
+    $ ./odo -r /log/restarts
+    
+Set the count to a number (for testing notifications, perhaps):
+
+    $ ./odo -s 12345 /log/restarts
+
+Print usage / help:
+
+    $ ./odo -h
+
+## BUGS
+
+**odo**'s atomicity is only as reliable as the underlying filesystem's.
+Inconsistencies may still occur if used on a non-local filesystems
+such as *nfs*.
+
+## COPYRIGHT
+
+**odo** is Copyright (C) 2014 Scott Vokes <scott.vokes@atomicobject.com>.
+
+## SEE ALSO
+
+runit(8), sqlite3(1), nfsd(8)

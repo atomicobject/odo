@@ -1,0 +1,23 @@
+#!/bin/sh
+rm -f foo
+./odo foo
+awk 'BEGIN {for (i=1; i<9998; i++) { printf("%d ", i) }}' |
+xargs -n 1 -P 32 ./odo foo
+
+# test value after lots of hopefully concurrent runs
+if [ "9999" != $(./odo -p foo) ]; then
+    exit 1
+fi
+
+# test setting
+if [ "1234" != $(./odo -s 1234 -p foo) ]; then
+    exit 1
+fi
+
+# test incrementing
+if [ "1235" != $(./odo -p foo) ]; then
+    exit 1
+fi
+
+rm -f foo
+echo all tests passed
