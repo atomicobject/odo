@@ -3,7 +3,7 @@ OPTIMIZE =	-O3
 WARN =		-Wall -pedantic -Wextra
 
 # Uncomment this to use 8-byte counters, if supported.
-#CDEFS +=	=-DCOUNTER_SIZE=8
+#CDEFS +=	-DCOUNTER_SIZE=8
 
 # This is written in C99 and expects POSIX getopt.
 CSTD +=		-std=c99 -D_POSIX_C_SOURCE=2 -D_C99_SOURCE
