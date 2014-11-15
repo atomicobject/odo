@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>odo(1) - an atomic odometer for the command line</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#OPTIONS">OPTIONS</a>
+    <a href="#EXIT-STATUS">EXIT STATUS</a>
+    <a href="#EXAMPLES">EXAMPLES</a>
+    <a href="#BUGS">BUGS</a>
+    <a href="#COPYRIGHT">COPYRIGHT</a>
+    <a href="#SEE-ALSO">SEE ALSO</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>odo(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>odo(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>odo</code> - <span class="man-whatis">an atomic odometer for the command line</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>odo</code> [-i | -r | -s COUNT] [-p] <var>file</var></p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p>odo atomically updates a count in a file, which will be created if not
+present. The count is text-formatted (e.g. "00012345\n"), and will be
+accurately incremented or reset even when multiple processes attempt to
+change the counter at the same time. (It uses memory mapping and atomic
+compare-and-swap operations to eliminate race conditions.)</p>
+
+<p>This could be used to track some intermittent event, like services being
+restarted. Since the counter is just a number in a text file, it's easy
+ls to compose odo with other tools.</p>
+
+<h2 id="OPTIONS">OPTIONS</h2>
+
+<p>These options impact how the counter is updated:</p>
+
+<dl>
+<dt class="flush"><code>-i</code></dt><dd><p>Increment the counter. (This is the default.)</p></dd>
+<dt class="flush"><code>-r</code></dt><dd><p>Reset the counter to 0.</p></dd>
+<dt><code>-s COUNT</code></dt><dd><p>Update the counter to a specific value.</p></dd>
+<dt class="flush"><code>-p</code></dt><dd><p>Print the new value of the counter after updating.</p></dd>
+</dl>
+
+
+<h2 id="EXIT-STATUS">EXIT STATUS</h2>
+
+<p>Returns 0 if the counter has been successfully updated. Returns 1 if the
+file could not be read, created, or written, or if its current contents
+do not match the expected format of a counter file.</p>
+
+<h2 id="EXAMPLES">EXAMPLES</h2>
+
+<p>This atomically increments a counter in /log/restarts. If the counter
+file does not exist, it is created as 0 and incremented to 1.</p>
+
+<pre><code>$ odo /log/restarts
+</code></pre>
+
+<p>Same, but print the updated count:</p>
+
+<pre><code>$ odo -p /log/restarts
+</code></pre>
+
+<p>Reset the count to 0:</p>
+
+<pre><code>$ ./odo -r /log/restarts
+</code></pre>
+
+<p>Set the count to a number (for testing notifications, perhaps):</p>
+
+<pre><code>$ ./odo -s 12345 /log/restarts
+</code></pre>
+
+<p>Print usage / help:</p>
+
+<pre><code>$ ./odo -h
+</code></pre>
+
+<h2 id="BUGS">BUGS</h2>
+
+<p><strong>odo</strong>'s atomicity is only as reliable as the underlying filesystem's.
+Inconsistencies may still occur if used on a non-local filesystems
+such as <em>nfs</em>.</p>
+
+<h2 id="COPYRIGHT">COPYRIGHT</h2>
+
+<p><strong>odo</strong> is Copyright (C) 2014 Scott Vokes <a href="&#109;&#97;&#x69;&#108;&#116;&#111;&#x3a;&#115;&#99;&#x6f;&#116;&#x74;&#x2e;&#x76;&#x6f;&#x6b;&#x65;&#x73;&#64;&#97;&#x74;&#111;&#109;&#105;&#x63;&#x6f;&#x62;&#106;&#101;&#x63;&#116;&#46;&#x63;&#x6f;&#x6d;" data-bare-link="true">&#115;&#x63;&#111;&#116;&#116;&#x2e;&#118;&#x6f;&#107;&#101;&#115;&#x40;&#x61;&#x74;&#111;&#x6d;&#x69;&#99;&#x6f;&#x62;&#x6a;&#101;&#99;&#116;&#46;&#x63;&#111;&#x6d;</a>.</p>
+
+<h2 id="SEE-ALSO">SEE ALSO</h2>
+
+<p><span class="man-ref">runit<span class="s">(8)</span></span>, <span class="man-ref">sqlite3<span class="s">(1)</span></span>, <span class="man-ref">nfsd<span class="s">(8)</span></span></p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>November 2014</li>
+    <li class='tr'>odo(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>

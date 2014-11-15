@@ -4,10 +4,9 @@ odo - an atomic odometer for the command line
 
 odo atomically updates a count in a file, which will be created if not
 present. The count is text-formatted (e.g. "00012345\n"), and will be
-accurately incremented or reset the counter even if multiple processes
-are attempting to change the counter at the same time. (It uses memory
-mapping and atomic compare-and-swap operations to eliminate race
-conditions.)
+accurately incremented or reset even when multiple processes attempt to
+change the counter at the same time. (It uses memory mapping and atomic
+compare-and-swap operations to eliminate race conditions.)
 
 
 ## Use cases

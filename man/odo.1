@@ -1,0 +1,112 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "ODO" "1" "November 2014" "" ""
+.
+.SH "NAME"
+\fBodo\fR \- an atomic odometer for the command line
+.
+.SH "SYNOPSIS"
+\fBodo\fR [\-i | \-r | \-s COUNT] [\-p] \fIfile\fR
+.
+.SH "DESCRIPTION"
+odo atomically updates a count in a file, which will be created if not present\. The count is text\-formatted (e\.g\. "00012345\en"), and will be accurately incremented or reset even when multiple processes attempt to change the counter at the same time\. (It uses memory mapping and atomic compare\-and\-swap operations to eliminate race conditions\.)
+.
+.P
+This could be used to track some intermittent event, like services being restarted\. Since the counter is just a number in a text file, it\'s easy ls to compose odo with other tools\.
+.
+.SH "OPTIONS"
+These options impact how the counter is updated:
+.
+.TP
+\fB\-i\fR
+Increment the counter\. (This is the default\.)
+.
+.TP
+\fB\-r\fR
+Reset the counter to 0\.
+.
+.TP
+\fB\-s COUNT\fR
+Update the counter to a specific value\.
+.
+.TP
+\fB\-p\fR
+Print the new value of the counter after updating\.
+.
+.SH "EXIT STATUS"
+Returns 0 if the counter has been successfully updated\. Returns 1 if the file could not be read, created, or written, or if its current contents do not match the expected format of a counter file\.
+.
+.SH "EXAMPLES"
+This atomically increments a counter in /log/restarts\. If the counter file does not exist, it is created as 0 and incremented to 1\.
+.
+.IP "" 4
+.
+.nf
+
+$ odo /log/restarts
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Same, but print the updated count:
+.
+.IP "" 4
+.
+.nf
+
+$ odo \-p /log/restarts
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Reset the count to 0:
+.
+.IP "" 4
+.
+.nf
+
+$ \./odo \-r /log/restarts
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Set the count to a number (for testing notifications, perhaps):
+.
+.IP "" 4
+.
+.nf
+
+$ \./odo \-s 12345 /log/restarts
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Print usage / help:
+.
+.IP "" 4
+.
+.nf
+
+$ \./odo \-h
+.
+.fi
+.
+.IP "" 0
+.
+.SH "BUGS"
+\fBodo\fR\'s atomicity is only as reliable as the underlying filesystem\'s\. Inconsistencies may still occur if used on a non\-local filesystems such as \fInfs\fR\.
+.
+.SH "COPYRIGHT"
+\fBodo\fR is Copyright (C) 2014 Scott Vokes \fIscott\.vokes@atomicobject\.com\fR\.
+.
+.SH "SEE ALSO"
+runit(8), sqlite3(1), nfsd(8)
