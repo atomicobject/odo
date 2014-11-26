@@ -31,7 +31,7 @@
 #include "types.h"
 
 #define ODO_VERSION_MAJOR 0
-#define ODO_VERSION_MINOR 1
+#define ODO_VERSION_MINOR 2
 #define ODO_VERSION_PATCH 0
 #define ODO_AUTHOR "Scott Vokes <scott.vokes@atomicobject.com>"
 
@@ -49,8 +49,9 @@ static void usage(const char *progname) {
         ODO_VERSION_MAJOR, ODO_VERSION_MINOR, ODO_VERSION_PATCH,
         ODO_AUTHOR);
     fprintf(stderr,
-        "usage: %s [-i | -r | -s COUNT] [-p] FILE\n"
+        "usage: %s [-c | -i | -r | -s COUNT] [-p] FILE\n"
         "    -h:         print this help\n"
+        "    -c:         print current counter without incrementing\n"
         "    -i:         increment the counter (default)\n"
         "    -p:         print count after update\n"
         "    -r:         reset counter to 0\n"
@@ -62,8 +63,11 @@ static void usage(const char *progname) {
 static void parse_args(config_t *cfg, int argc, char **argv) {
     int a = 0;
 
-    while ((a = getopt(argc, argv, "hprs:")) != -1) {
+    while ((a = getopt(argc, argv, "chprs:")) != -1) {
         switch (a) {
+        case 'c':
+            cfg->op = OP_CAT;       /* print current w/out update */
+            break;
         case 'i':                   /* increment */
             cfg->op = OP_INC;
             break;
@@ -174,7 +178,7 @@ static int create_new_counter_file(const char *path) {
 
 /* Read the current counter, which is a numeric string such as "00001230",
  * and convert it to a numeric counter. */
-static void read_old_counter(counter_t *pc, counter_t *val) {
+static void read_current_counter(counter_t *pc, counter_t *val) {
     char buf[sizeof(counter_t) + 1];
     buf[sizeof(counter_t)] = '\0';
     memcpy(buf, pc, sizeof(counter_t));
@@ -215,7 +219,7 @@ static void increment_counter(counter_t *pc, bool print) {
     for (;;) {
         counter_t c = *pc;
         counter_t old = 0;
-        read_old_counter(pc, &old);
+        read_current_counter(pc, &old);
         counter_t new = old + 1;
         counter_t new_string = 0;
         format_counter(&new_string, new);
@@ -227,12 +231,19 @@ static void increment_counter(counter_t *pc, bool print) {
     }
 }
 
+/* Atomically cat the current value without updating it. */
+static void cat_counter(counter_t *pc) {
+    counter_t cur = 0;
+    read_current_counter(pc, &cur);
+    print_as_decimal(cur);
+}
+
 /* Atomically change the decimal numeric string. */
 static void set_counter(counter_t *pc, counter_t nv, bool print) {
     for (;;) {
         counter_t c = *pc;
         counter_t old = 0;
-        read_old_counter(pc, &old);
+        read_current_counter(pc, &old);
         counter_t new_string = 0;
         format_counter(&new_string, nv);
 
@@ -267,8 +278,14 @@ int main(int argc, char **argv) {
     case OP_INC:
         increment_counter((counter_t *)cfg.p, cfg.print);
         break;
+    case OP_CAT:
+        cat_counter((counter_t *)cfg.p);
+        break;
     case OP_SET:
         set_counter((counter_t *)cfg.p, cfg.new_value, cfg.print);
+        break;
+    default:
+        return EXIT_FAILURE;
     }
     close_counter_file(&cfg);
     return EXIT_SUCCESS;

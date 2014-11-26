@@ -7,7 +7,7 @@
 \fBodo\fR \- an atomic odometer for the command line
 .
 .SH "SYNOPSIS"
-\fBodo\fR [\-i | \-r | \-s COUNT] [\-p] \fIfile\fR
+\fBodo\fR [\-c | \-i | \-r | \-s COUNT] [\-p] \fIfile\fR
 .
 .SH "DESCRIPTION"
 odo atomically updates a count in a file, which will be created if not present\. The count is text\-formatted (e\.g\. "00012345\en"), and will be accurately incremented or reset even when multiple processes attempt to change the counter at the same time\. (It uses memory mapping and atomic compare\-and\-swap operations to eliminate race conditions\.)
@@ -17,6 +17,10 @@ This could be used to track some intermittent event, like services being restart
 .
 .SH "OPTIONS"
 These options impact how the counter is updated:
+.
+.TP
+\fB\-c\fR
+Print the current counter value without updating\.
 .
 .TP
 \fB\-i\fR
@@ -84,6 +88,19 @@ Set the count to a number (for testing notifications, perhaps):
 .nf
 
 $ \./odo \-s 12345 /log/restarts
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Print the current counter value without incrementing:
+.
+.IP "" 4
+.
+.nf
+
+$ \./odo \-c /log/restarts
 .
 .fi
 .

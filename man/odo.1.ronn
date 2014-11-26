@@ -3,7 +3,7 @@ odo(1) -- an atomic odometer for the command line
 
 ## SYNOPSIS
 
-`odo` [-i | -r | -s COUNT] [-p] <file>
+`odo` [-c | -i | -r | -s COUNT] [-p] <file>
 
 ## DESCRIPTION
 
@@ -20,6 +20,9 @@ ls to compose odo with other tools.
 ## OPTIONS
 
 These options impact how the counter is updated:
+
+  * `-c`:
+    Print the current counter value without updating.
 
   * `-i`:
     Increment the counter. (This is the default.)
@@ -57,6 +60,10 @@ Reset the count to 0:
 Set the count to a number (for testing notifications, perhaps):
 
     $ ./odo -s 12345 /log/restarts
+
+Print the current counter value without incrementing:
+
+    $ ./odo -c /log/restarts
 
 Print usage / help:
 

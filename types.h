@@ -30,7 +30,7 @@ typedef uint32_t counter_t;
 #define NAME_OF_STRTOC "strtol"
 #endif
 
-typedef enum { OP_INC, OP_SET, } op_t;
+typedef enum { OP_INC, OP_SET, OP_CAT, } op_t;
 
 typedef struct {
     const char *path;

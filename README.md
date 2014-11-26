@@ -66,6 +66,10 @@ Set the count to a number (for testing notifications, perhaps):
 
     $ ./odo -s 12345 /log/restarts
 
+Print the current counter value without incrementing:
+
+    $ ./odo -c /log/restarts
+
 Print usage / help:
 
     $ ./odo -h
