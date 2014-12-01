@@ -5,18 +5,20 @@ odo - an atomic odometer for the command line
 odo atomically updates a count in a file, which will be created if not
 present. The count is text-formatted (e.g. "00012345\n"), and will be
 accurately incremented or reset even when multiple processes attempt to
-change the counter at the same time. (It uses memory mapping and atomic
-compare-and-swap operations to eliminate race conditions.)
+change the counter at the same time. (It uses [memory mapping and atomic
+compare-and-swap operations][1] to eliminate race conditions.)
+
+[1]: https://spin.atomicobject.com/2014/11/24/odo-atomic-counters-from-the-command-line/
 
 
 ## Use cases
 
 This could be used to track some intermittent event, like services being
-restarted. (This was the [original inspiration][1].) Since the counter
+restarted. (This was the [original inspiration][2].) Since the counter
 is just a number in a text file, it's easy to compose odo with other
 tools.
 
-[1]: https://twitter.com/nrr/status/529016501421240322
+[2]: https://twitter.com/nrr/status/529016501421240322
 
 
 ## Dependencies
