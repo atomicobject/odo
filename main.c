@@ -32,7 +32,7 @@
 
 #define ODO_VERSION_MAJOR 0
 #define ODO_VERSION_MINOR 2
-#define ODO_VERSION_PATCH 0
+#define ODO_VERSION_PATCH 1
 #define ODO_AUTHOR "Scott Vokes <scott.vokes@atomicobject.com>"
 
 /* Forward references */
@@ -45,6 +45,9 @@ static void set_counter(counter_t *pc, counter_t nv, bool print);
 static void print_as_decimal(counter_t c);
 
 static void usage(const char *progname) {
+    if (progname == NULL) {
+        progname = "odo";
+    }
     fprintf(stderr, "odometer version %u.%u.%u by %s\n",
         ODO_VERSION_MAJOR, ODO_VERSION_MINOR, ODO_VERSION_PATCH,
         ODO_AUTHOR);
