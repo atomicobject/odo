@@ -44,10 +44,11 @@ static void increment_counter(counter_t *pc, bool print);
 static void set_counter(counter_t *pc, counter_t nv, bool print);
 static void print_as_decimal(counter_t c);
 
-static void usage(const char *progname) {
-    if (progname == NULL) {
-        progname = "odo";
-    }
+static const char *progname = NULL;
+
+static void usage(void) {
+    if (progname == NULL) { progname = "odo"; }
+
     fprintf(stderr, "odometer version %u.%u.%u by %s\n",
         ODO_VERSION_MAJOR, ODO_VERSION_MINOR, ODO_VERSION_PATCH,
         ODO_AUTHOR);
@@ -88,7 +89,7 @@ static void parse_args(config_t *cfg, int argc, char **argv) {
             break;
         case 'h':                   /* fall through */
         case '?':                   /* help / bad arg */
-            usage(argv[0]);
+            usage();
         }
     }
 
@@ -96,7 +97,7 @@ static void parse_args(config_t *cfg, int argc, char **argv) {
     argv += optind;
 
     if (argc < 1) {
-        usage(argv[0]);
+        usage();
     } else {
         cfg->path = argv[0];
     }
@@ -268,6 +269,9 @@ static void print_as_decimal(counter_t c) {
 
 int main(int argc, char **argv) {
     config_t cfg = { .op = OP_INC, };
+
+    /* Grab program name before getopt discards it. */
+    if (argc > 0) { progname = argv[0]; }
 
     parse_args(&cfg, argc, argv);
     open_counter_file(&cfg);
