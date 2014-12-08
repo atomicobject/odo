@@ -38,7 +38,7 @@ typedef struct {
     counter_t new_value;        /* value to set */
     bool print;
     int fd;
-    void *p;                    /* raw memory */
+    uint8_t *p;                 /* raw memory */
 } config_t;
 
 #endif
