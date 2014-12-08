@@ -38,11 +38,11 @@
 /* Forward references */
 static void open_counter_file(config_t *cfg);
 static void close_counter_file(config_t *cfg);
-static int create_new_counter_file(const char *path);
 static bool check_format(const char *file);
 static void increment_counter(counter_t *pc, bool print);
 static void set_counter(counter_t *pc, counter_t nv, bool print);
 static void print_as_decimal(counter_t c);
+static void format_counter(counter_t *pc, counter_t v);
 
 static const char *progname = NULL;
 
@@ -106,31 +106,18 @@ static void parse_args(config_t *cfg, int argc, char **argv) {
 /* Open and mmap a counter file, so it can be updated atomically. */
 static void open_counter_file(config_t *cfg) {
     int fd = -1;
+    off_t size;
 
-    /* Retry until successful safe open/create. It shouldn't be possible
-     * to get into an infinite loop of "Doesn't exist" / "Already
-     * exists", and any other errors will exit. */
-    while (fd == -1) {
-        /* Try to open it as an existing file. */
-        fd = open(cfg->path, O_RDWR);
-        if (fd == -1) {
-            if (errno == ENOENT) {  /* does not exist */
-                errno = 0;
-                /* Attempt to atomically create it. */
-                fd = create_new_counter_file(cfg->path);
-            } else {
-                err(EXIT_FAILURE, "open");
-            }
-        }
+    /* Open counter file, creating it if necessary */
+    fd = open(cfg->path, O_RDWR | O_CREAT, 0644);
+    if (fd == -1) {
+        err(EXIT_FAILURE, "open");
     }
-    
-    /* Check file size: should match counter and '\n'. */
-    struct stat sbuf;
-    if (fstat(fd, &sbuf) == -1) { err(EXIT_FAILURE, "stat"); }
-    if (sbuf.st_size != (sizeof(counter_t) + sizeof(char))) {
-        fprintf(stderr,
-            "Unexpected size %zd, not a valid counter file.\n",
-            (size_t)sbuf.st_size);
+    if (lseek(fd, 0, SEEK_END) == 0) {
+        if (ftruncate(fd, sizeof(counter_t) + 1) == -1) { err(EXIT_FAILURE, "ftruncate"); }
+    }
+    if (lseek(fd, 0, SEEK_END) != sizeof(counter_t) + 1) {
+        printf( "Unexpected size, not a valid counter file.\n");
         exit(EXIT_FAILURE);
     }
 
@@ -139,6 +126,12 @@ static void open_counter_file(config_t *cfg) {
         
     if (p == MAP_FAILED) {
         err(EXIT_FAILURE, "mmap");
+    }
+    /* Convert to text. If failed it means other odo already did it for us. */
+    counter_t text_zero;
+    format_counter(&text_zero, 0);
+    if (ATOMIC_BOOL_COMPARE_AND_SWAP((counter_t *)p, 0, text_zero)) {
+        ((char*)p)[sizeof(counter_t)] = '\n';
     }
 
     cfg->fd = fd;
@@ -151,33 +144,6 @@ static void close_counter_file(config_t *cfg) {
         err(EXIT_FAILURE, "munmap");
     }
     close(cfg->fd);
-}
-
-/* Create a new counter file, initialized to the appropriate
- * number of '0's (platform-specific) and a newline.. */
-static int create_new_counter_file(const char *path) {
-    /* Create and open, but only if it doesn't already exist. */
-    int fd = open(path, O_RDWR | O_CREAT | O_EXCL, 0644);
-    if (fd == -1) {
-        if (errno == EEXIST) {  /* already exists */
-            errno = 0;
-            return -1;          /* retry as existing file */
-        }
-        err(EXIT_FAILURE, "open");
-    }
-
-    uint8_t counter_txt[sizeof(counter_t) + sizeof(char)];
-    memset(counter_txt, '0', sizeof(counter_txt));
-    /* Add a line break so it cats nicely. */
-    counter_txt[sizeof(counter_t)] = '\n';
-
-    ssize_t res = write(fd, counter_txt, sizeof(counter_txt));
-    if (res == sizeof(counter_txt)) { /* written in full */
-        return fd;
-    } else {
-        err(EXIT_FAILURE, "write");
-        return EXIT_FAILURE;
-    }
 }
 
 /* Read the current counter, which is a numeric string such as "00001230",

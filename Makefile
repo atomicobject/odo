@@ -6,7 +6,7 @@ WARN =		-Wall -pedantic -Wextra
 #CDEFS +=	-DCOUNTER_SIZE=8
 
 # This is written in C99 and expects POSIX getopt.
-CSTD +=		-std=c99 -D_POSIX_C_SOURCE=2 -D_C99_SOURCE
+CSTD +=		-std=c99 -D_POSIX_C_SOURCE=200809 -D_C99_SOURCE
 
 CFLAGS +=	${CSTD} -g ${WARN} ${CDEFS} ${CINCS} ${OPTIMIZE}
 
