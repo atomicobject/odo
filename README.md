@@ -62,19 +62,19 @@ Same, but print the updated count:
     
 Reset the count to 0:
 
-    $ ./odo -r /log/restarts
+    $ odo -r /log/restarts
     
 Set the count to a number (for testing notifications, perhaps):
 
-    $ ./odo -s 12345 /log/restarts
+    $ odo -s 12345 /log/restarts
 
 Print the current counter value without incrementing:
 
-    $ ./odo -c /log/restarts
+    $ odo -c /log/restarts
 
 Print usage / help:
 
-    $ ./odo -h
+    $ odo -h
 
 
 ## Note
