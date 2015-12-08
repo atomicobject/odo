@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2014 Scott Vokes <scott.vokes@atomicobject.com>
+ * Copyright (c) 2014 Scott Vokes <vokes.s@gmail.com>
  *  
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -33,8 +33,8 @@
 
 #define ODO_VERSION_MAJOR 0
 #define ODO_VERSION_MINOR 2
-#define ODO_VERSION_PATCH 2
-#define ODO_AUTHOR "Scott Vokes <scott.vokes@atomicobject.com>"
+#define ODO_VERSION_PATCH 3
+#define ODO_AUTHOR "Scott Vokes <vokes.s@gmail.com>"
 
 /* Forward references */
 static void open_counter_file(config_t *cfg);
